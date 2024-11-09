@@ -62,9 +62,7 @@ when is_main_module:
   add_quit_proc(cleanup_lock)
   process_initially()
 
-  let fnim = find_first_nimble_file()
-
-  if fnim == "":
+  if find_first_nimble_file() == "":
     echo "No .nimble found, go to a directory where there is one."
     quit(1)
 
