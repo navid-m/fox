@@ -23,6 +23,15 @@ proc process_initially() =
     file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
 
 proc check() {.thread.} =
+  proc rebuild_loop() =
+    while(true):
+      let exit_code = os.exec_shell_cmd("nimble build")
+      if exit_code != 0:
+        echo("Build failed, press any key to retry build")
+        discard stdin.read_line()
+        continue
+      break
+
   if try_acquire(build_lock):
     try:
       if is_building:
@@ -34,11 +43,9 @@ proc check() {.thread.} =
             osproc.terminate(main_program_process)
             echo("Project files changed, rebuilding...")
             is_building = true
-            let exit_code = os.exec_shell_cmd("nimble build")
-            if exit_code != 0:
-              echo("Build failed, press any key to retry build")
-              discard stdin.read_line()
-              continue
+
+            rebuild_loop()
+
             file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
             is_building = false
             run_main_proc()
