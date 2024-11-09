@@ -5,7 +5,7 @@ author        = "Navid M"
 description   = "Simple hot reloading for Nim applications"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["rake"]
+bin           = @["fox"]
 
 
 # Dependencies
