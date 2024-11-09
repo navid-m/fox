@@ -21,7 +21,7 @@ proc run_main_proc() =
 
 proc process_initially() =
   for path in get_file_list():
-    file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
+    file_to_last_modded[path.path] = path.last_mod_time.to_unix_float
 
 proc rebuild_loop() =
   while true:
@@ -39,12 +39,12 @@ proc check() {.thread.} =
 
       for path in get_file_list():
         {.gcsafe.}:
-          if file_to_last_modded[path.path] < path.lastModTime.toUnixFloat:
+          if file_to_last_modded[path.path] < path.last_mod_time.to_unix_float:
             osproc.terminate(main_program_process)
             echo("Project files changed, rebuilding...")
             is_building = true
             rebuild_loop()
-            file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
+            file_to_last_modded[path.path] = path.last_mod_time.to_unix_float
             is_building = false
             run_main_proc()
     finally:
