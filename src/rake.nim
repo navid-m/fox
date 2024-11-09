@@ -5,6 +5,7 @@ import
   locks,
   osproc,
   threadpool,
+  std/exitprocs,
   mods/filters
 
 var
@@ -55,11 +56,12 @@ proc run_checks() =
     spawn check()
 
 proc cleanup_lock() {.noconv.} =
+  echo("Bye")
   deinit_lock(build_lock)
 
 when is_main_module:
   init_lock(build_lock)
-  add_quit_proc(cleanup_lock)
+  exitprocs.add_exit_proc(cleanup_lock)
   process_initially()
 
   if find_first_nimble_file() == "":
