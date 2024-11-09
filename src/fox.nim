@@ -57,7 +57,7 @@ proc check() {.thread.} =
 
 proc run_checks() =
   while true:
-    sleep(20)
+    sleep(10)
     spawn check()
 
 proc cleanup_lock() {.noconv.} =
