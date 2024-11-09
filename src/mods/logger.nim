@@ -1,2 +1,1 @@
-proc log*(message: string) =
-  echo("fox: " & message)
+proc log*(message: string) = echo("fox: " & message)
