@@ -2,7 +2,6 @@ import
     std/strutils,
     filters
 
-
 proc run_rec_error_test*() =
     var to_check_for = "fox"
 
