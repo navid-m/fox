@@ -48,13 +48,14 @@ proc check() {.thread.} =
 
             file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
             is_building = false
+
             run_main_proc()
     finally:
       release(build_lock)
 
 proc run_checks() =
   while true:
-    sleep(500)
+    sleep(200)
     spawn check()
 
 proc cleanup_lock() {.noconv.} =
