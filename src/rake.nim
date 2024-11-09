@@ -1,8 +1,27 @@
 import
   re,
   strutils,
-  os
+  os,
+  times,
+  tables,
+  threadpool
 
+
+type
+  FileInfo = object
+    path: string
+    lastModTime: Time
+
+proc get_file_list(): seq[FileInfo] =
+  result = @[]
+  for file in walk_dir_rec(getCurrentDir()):
+    if file.endsWith(".nim"):
+      result.add(
+        FileInfo(
+          path: file,
+          lastModTime: get_last_modification_time(file)
+        )
+      )
 
 proc find_first_nimble_file(): string =
   for entry in walkDir(os.getCurrentDir()):
@@ -34,11 +53,33 @@ proc get_executable_name(nimble_file: string): string =
 
   return exec_name
 
-when is_main_module:
-  let fnim = find_first_nimble_file()
+var file_to_last_modded = initTable[string, float]()
 
+proc process_initially() =
+  for path in get_file_list():
+    file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
+
+
+proc check() {.thread.} =
+  for path in get_file_list():
+    {.gcsafe.}:
+      if file_to_last_modded[path.path] < path.lastModTime.toUnixFloat:
+        echo("Some shit happened here")
+        file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
+      else:
+        echo("f_t_l_m = " & $file_to_last_modded[path.path])
+        echo("p_tounixfloat = " & $path.lastModTime.toUnixFloat)
+        echo("ok nothing happened")
+
+proc run_checks() =
+  while true:
+    sleep(1000)
+    spawn check()
+
+when is_main_module:
+  process_initially()
+  let fnim = find_first_nimble_file()
   if fnim == "":
     echo "No .nimble found, go to a directory where there is one."
     quit(1)
-
-  echo get_executable_name(fnim)
+  run_checks()
