@@ -68,8 +68,8 @@ proc run_checks() =
     spawn check()
 
 proc cleanup_lock() {.noconv.} =
-  deinit_lock(build_lock)
   log("Bye")
+  deinit_lock(build_lock)
 
 when is_main_module:
   run_rec_error_test()
