@@ -23,7 +23,7 @@ proc process_initially() =
     file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
 
 proc rebuild_loop() =
-  while(true):
+  while true:
     if os.exec_shell_cmd("nimble build") != 0:
       echo("Build failed, press any key to retry build")
       discard stdin.read_line()
