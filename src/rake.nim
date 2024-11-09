@@ -13,8 +13,6 @@ var
   is_building = false
   main_program_process: Process
 
-init_lock(build_lock)
-
 proc run_main_proc() =
   let exec_name = get_executable_name()
   echo("Running " & exec_name)
@@ -55,8 +53,8 @@ proc run_checks() =
 proc cleanup_lock() {.noconv.} =
   deinit_lock(build_lock)
 
-
 when is_main_module:
+  init_lock(build_lock)
   add_quit_proc(cleanup_lock)
   process_initially()
 
