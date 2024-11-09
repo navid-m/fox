@@ -39,7 +39,10 @@ proc get_executable_name*(): string =
     exec_name = extract_text(match)
 
   if exec_name.len == 0:
-    raise new_exception(ValueError, "No executable name found in nimble file")
+    raise new_exception(
+      ValueError,
+      "No executable name found in nimble file"
+    )
 
   when defined windows:
     exec_name.add(".exe")
