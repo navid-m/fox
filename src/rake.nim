@@ -9,8 +9,8 @@ import
 
 var
   file_to_last_modded = init_table[string, float]()
-  build_lock: Lock
   is_building = false
+  build_lock: Lock
   main_program_process: Process
 
 proc run_main_proc() =
