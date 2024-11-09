@@ -33,9 +33,8 @@ proc get_executable_name*(): string =
   var nimble_file = find_first_nimble_file()
   var content = read_file(nimble_file)
   var exec_name = ""
-  let bin_pattern = re"bin\s*=\s*@\[(.*?)\]"
 
-  for match in find_all(content, bin_pattern):
+  for match in find_all(content, re"bin\s*=\s*@\[(.*?)\]"):
     exec_name = extract_text(match)
 
   if exec_name.len == 0:
