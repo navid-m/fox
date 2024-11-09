@@ -30,8 +30,7 @@ proc get_file_list*(): seq[CustomFileInfo] =
       )
 
 proc get_executable_name*(): string =
-  var nimble_file = find_first_nimble_file()
-  var content = read_file(nimble_file)
+  var content = read_file(find_first_nimble_file())
   var exec_name = ""
 
   for match in find_all(content, re"bin\s*=\s*@\[(.*?)\]"):
