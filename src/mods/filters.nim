@@ -4,12 +4,6 @@ import
   re,
   models
 
-proc find_first_nimble_file*(): string =
-  for entry in walk_dir(os.get_current_dir()):
-    if entry.path.ends_with(".nimble"):
-      return entry.path
-  return ""
-
 proc extract_text(input: string): string =
   let start_index = input.find("@[\"")
   let end_index = input.find("\"]")
@@ -17,6 +11,12 @@ proc extract_text(input: string): string =
     result = input[start_index + 3 .. end_index - 1]
   else:
     result = ""
+
+proc find_first_nimble_file*(): string =
+  for entry in walk_dir(os.get_current_dir()):
+    if entry.path.ends_with(".nimble"):
+      return entry.path
+  return ""
 
 proc get_file_list*(): seq[CustomFileInfo] =
   result = @[]
