@@ -24,7 +24,10 @@ var
 proc run_main_proc() =
   let exec_name = get_executable_name()
   log("Running " & exec_name)
-  main_program_process = osproc.startProcess(exec_name, options = {poParentStreams})
+  main_program_process = osproc.start_process(
+    exec_name,
+    options = {po_parent_streams}
+  )
 
 proc process_initially() =
   log("Running initial build...")
@@ -65,7 +68,7 @@ proc run_checks() =
     spawn check()
 
 proc cleanup_lock() {.noconv.} =
-  echo("Bye")
+  log("Bye")
   deinit_lock(build_lock)
 
 when is_main_module:
