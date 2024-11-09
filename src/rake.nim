@@ -4,6 +4,7 @@ import
   os,
   times,
   tables,
+  locks,
   threadpool
 
 
@@ -53,28 +54,46 @@ proc get_executable_name(nimble_file: string): string =
 
   return exec_name
 
-var file_to_last_modded = initTable[string, float]()
+var
+  file_to_last_modded = initTable[string, float]()
+  build_lock: Lock
+  is_building = false
+
+initLock(build_lock)
 
 proc process_initially() =
   for path in get_file_list():
     file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
 
-
 proc check() {.thread.} =
-  for path in get_file_list():
-    {.gcsafe.}:
-      if file_to_last_modded[path.path] < path.lastModTime.toUnixFloat:
-        echo("Some shit happened here")
-        file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
-      else:
-        echo("f_t_l_m = " & $file_to_last_modded[path.path])
-        echo("p_tounixfloat = " & $path.lastModTime.toUnixFloat)
-        echo("ok nothing happened")
+  if tryAcquire(build_lock):
+    try:
+      if is_building:
+        return
+
+      for path in get_file_list():
+        {.gcsafe.}:
+          if file_to_last_modded[path.path] < path.lastModTime.toUnixFloat:
+            echo("Project files changed, rebuilding...")
+            is_building = true
+            let exit_code = os.execShellCmd("nimble build")
+            if exit_code != 0:
+              echo("Build failed, press any key to retry build")
+              discard stdin.readLine()
+            file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
+            is_building = false
+    finally:
+      release(build_lock)
 
 proc run_checks() =
   while true:
     sleep(1000)
     spawn check()
+
+proc cleanupLock() {.noconv.} =
+  deinitLock(build_lock)
+
+addQuitProc(cleanupLock)
 
 when is_main_module:
   process_initially()
