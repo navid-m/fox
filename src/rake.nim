@@ -89,6 +89,7 @@ proc check() {.thread.} =
             if exit_code != 0:
               echo("Build failed, press any key to retry build")
               discard stdin.read_line()
+              continue
             file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
             is_building = false
             run_main_proc()
