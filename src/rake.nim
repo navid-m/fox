@@ -15,7 +15,7 @@ type
 
 proc get_file_list(): seq[FileInfo] =
   result = @[]
-  for file in walk_dir_rec(getCurrentDir()):
+  for file in walk_dir_rec(get_current_dir()):
     if file.endsWith(".nim"):
       result.add(
         FileInfo(
@@ -25,7 +25,7 @@ proc get_file_list(): seq[FileInfo] =
       )
 
 proc find_first_nimble_file(): string =
-  for entry in walk_dir(os.getCurrentDir()):
+  for entry in walk_dir(os.get_current_dir()):
     if entry.path.ends_with(".nimble"):
       return entry.path
   return ""
