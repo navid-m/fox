@@ -11,9 +11,8 @@ proc extract_text(input: string): string =
   let start_index = input.find("@[\"")
   let end_index = input.find("\"]")
   if start_index != -1 and end_index != -1 and end_index > start_index:
-    result = input[start_index + 3 .. end_index - 1]
-  else:
-    result = ""
+    return input[start_index + 3 .. end_index - 1]
+  return ""
 
 proc find_first_nimble_file*(): string =
   for entry in walk_dir(os.get_current_dir()):
