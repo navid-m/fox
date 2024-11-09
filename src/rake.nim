@@ -60,16 +60,14 @@ var
   file_to_last_modded = init_table[string, float]()
   build_lock: Lock
   is_building = false
+  main_program_process: Process
 
 init_lock(build_lock)
 
-var main_program_process: Process
-
 proc run_main_proc() =
-  echo("Running " & get_executable_name())
-  main_program_process = osproc.startProcess(
-    get_executable_name()
-  )
+  let exec_name = get_executable_name()
+  echo("Running " & exec_name)
+  main_program_process = osproc.startProcess(exec_name)
 
 proc process_initially() =
   for path in get_file_list():
@@ -110,9 +108,10 @@ add_quit_proc(cleanup_lock)
 when is_main_module:
   process_initially()
   let fnim = find_first_nimble_file()
+
   if fnim == "":
     echo "No .nimble found, go to a directory where there is one."
     quit(1)
+
   run_main_proc()
   run_checks()
-
