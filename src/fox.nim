@@ -10,28 +10,32 @@ import
   ],
   mods/[
     filters,
-    checks
+    checks,
+    logger
   ]
 
 var
   file_to_last_modded = init_table[string, float]()
   is_building = false
+  build_cmd = "nimble build -d:nodebug -d:nochecks --opt:none --warnings:off"
   build_lock: Lock
   main_program_process: Process
 
 proc run_main_proc() =
   let exec_name = get_executable_name()
-  echo("Running " & exec_name)
+  log("Running " & exec_name)
   main_program_process = osproc.startProcess(exec_name, options = {poParentStreams})
 
 proc process_initially() =
+  log("Running initial build...")
+  discard os.exec_shell_cmd(build_cmd)
   for path in get_file_list():
     file_to_last_modded[path.path] = path.last_mod_time.to_unix_float
 
 proc rebuild_loop() =
   while true:
-    if os.exec_shell_cmd("nimble build -d:nodebug -d:nochecks --opt:none") != 0:
-      echo("Build failed, press any key to retry build")
+    if os.exec_shell_cmd(build_cmd) != 0:
+      log("Build failed, press any key to retry build")
       discard stdin.read_line()
       continue
     break
@@ -46,7 +50,7 @@ proc check() {.thread.} =
         {.gcsafe.}:
           if file_to_last_modded[path.path] < path.last_mod_time.to_unix_float:
             osproc.terminate(main_program_process)
-            echo("Project files changed, rebuilding...")
+            log("Project files changed, rebuilding...")
             is_building = true
             rebuild_loop()
             file_to_last_modded[path.path] = path.last_mod_time.to_unix_float
@@ -71,7 +75,7 @@ when is_main_module:
   process_initially()
 
   if find_first_nimble_file() == "":
-    echo("No .nimble found, go to a directory where there is one.")
+    log("No .nimble found, go to a directory where there is one.")
     quit(1)
 
   run_main_proc()
