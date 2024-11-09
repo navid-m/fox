@@ -1,11 +1,13 @@
 import
-  os,
-  times,
-  tables,
-  locks,
-  osproc,
-  threadpool,
-  std/exitprocs,
+  std/[
+    os,
+    times,
+    tables,
+    locks,
+    osproc,
+    exitprocs,
+    threadpool,
+  ],
   mods/filters
 
 var
