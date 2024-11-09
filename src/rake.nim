@@ -16,7 +16,7 @@ type
 proc get_file_list(): seq[FileInfo] =
   result = @[]
   for file in walk_dir_rec(get_current_dir()):
-    if file.endsWith(".nim"):
+    if file.ends_with(".nim"):
       result.add(
         FileInfo(
           path: file,
