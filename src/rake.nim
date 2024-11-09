@@ -17,7 +17,7 @@ var
 proc run_main_proc() =
   let exec_name = get_executable_name()
   echo("Running " & exec_name)
-  main_program_process = osproc.start_process(exec_name)
+  main_program_process = osproc.startProcess(exec_name, options = {poParentStreams})
 
 proc process_initially() =
   for path in get_file_list():
