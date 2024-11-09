@@ -30,7 +30,7 @@ proc process_initially() =
 
 proc rebuild_loop() =
   while true:
-    if os.exec_shell_cmd("nimble build -d:nodebug -d:nochecks --opt:none -d:release") != 0:
+    if os.exec_shell_cmd("nimble build -d:nodebug -d:nochecks --opt:none") != 0:
       echo("Build failed, press any key to retry build")
       discard stdin.read_line()
       continue
