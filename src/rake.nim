@@ -63,7 +63,7 @@ when is_main_module:
   process_initially()
 
   if find_first_nimble_file() == "":
-    echo "No .nimble found, go to a directory where there is one."
+    echo("No .nimble found, go to a directory where there is one.")
     quit(1)
 
   run_main_proc()
