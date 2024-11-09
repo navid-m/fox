@@ -8,7 +8,10 @@ import
     exitprocs,
     threadpool,
   ],
-  mods/filters
+  mods/[
+    filters,
+    checks
+  ]
 
 var
   file_to_last_modded = init_table[string, float]()
@@ -62,6 +65,7 @@ proc cleanup_lock() {.noconv.} =
   deinit_lock(build_lock)
 
 when is_main_module:
+  run_rec_error_test()
   init_lock(build_lock)
   exitprocs.add_exit_proc(cleanup_lock)
   process_initially()

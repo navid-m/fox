@@ -1,7 +1,9 @@
 import
-  os,
-  strutils,
-  re,
+  std/[
+    os,
+    strutils,
+    re,
+  ],
   models
 
 proc extract_text(input: string): string =
