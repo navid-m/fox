@@ -13,5 +13,5 @@ proc run_rec_error_test*() =
         echo(
             "Recursion issues may arise due to identical binary names, proceed anyway? (Y/N)"
         )
-        if (toLowerAscii(stdin.read_line()) != "y"):
+        if (to_lower_ascii(stdin.read_line()) != "y"):
             quit(0)
