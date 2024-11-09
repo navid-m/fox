@@ -25,8 +25,8 @@ proc get_file_list(): seq[FileInfo] =
       )
 
 proc find_first_nimble_file(): string =
-  for entry in walkDir(os.getCurrentDir()):
-    if entry.path.endsWith(".nimble"):
+  for entry in walk_dir(os.getCurrentDir()):
+    if entry.path.ends_with(".nimble"):
       return entry.path
   return ""
 
@@ -55,18 +55,18 @@ proc get_executable_name(nimble_file: string): string =
   return exec_name
 
 var
-  file_to_last_modded = initTable[string, float]()
+  file_to_last_modded = init_table[string, float]()
   build_lock: Lock
   is_building = false
 
-initLock(build_lock)
+init_lock(build_lock)
 
 proc process_initially() =
   for path in get_file_list():
     file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
 
 proc check() {.thread.} =
-  if tryAcquire(build_lock):
+  if try_acquire(build_lock):
     try:
       if is_building:
         return
@@ -76,10 +76,10 @@ proc check() {.thread.} =
           if file_to_last_modded[path.path] < path.lastModTime.toUnixFloat:
             echo("Project files changed, rebuilding...")
             is_building = true
-            let exit_code = os.execShellCmd("nimble build")
+            let exit_code = os.exec_shell_cmd("nimble build")
             if exit_code != 0:
               echo("Build failed, press any key to retry build")
-              discard stdin.readLine()
+              discard stdin.read_line()
             file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
             is_building = false
     finally:
@@ -90,10 +90,10 @@ proc run_checks() =
     sleep(1000)
     spawn check()
 
-proc cleanupLock() {.noconv.} =
-  deinitLock(build_lock)
+proc cleanup_lock() {.noconv.} =
+  deinit_lock(build_lock)
 
-addQuitProc(cleanupLock)
+add_quit_proc(cleanup_lock)
 
 when is_main_module:
   process_initially()
