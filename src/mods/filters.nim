@@ -4,7 +4,8 @@ import
     strutils,
     re,
   ],
-  models
+  models,
+  normal
 
 proc extract_text(input: string): string =
   let start_index = input.find("@[\"")
@@ -44,7 +45,4 @@ proc get_executable_name*(): string =
       "No executable name found in nimble file"
     )
 
-  when defined windows:
-    exec_name.add(".exe")
-
-  return exec_name
+  return normalize_binary_name(exec_name)
