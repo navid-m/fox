@@ -5,6 +5,7 @@ import
   times,
   tables,
   locks,
+  osproc,
   threadpool
 
 
@@ -38,7 +39,8 @@ proc extract_text(input: string): string =
   else:
     result = ""
 
-proc get_executable_name(nimble_file: string): string =
+proc get_executable_name(): string =
+  var nimble_file = find_first_nimble_file()
   var content = read_file(nimble_file)
   var exec_name = ""
   let bin_pattern = re"bin\s*=\s*@\[(.*?)\]"
@@ -61,6 +63,14 @@ var
 
 init_lock(build_lock)
 
+var main_program_process: Process
+
+proc run_main_proc() =
+  echo("Running " & get_executable_name())
+  main_program_process = osproc.startProcess(
+    get_executable_name()
+  )
+
 proc process_initially() =
   for path in get_file_list():
     file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
@@ -74,6 +84,7 @@ proc check() {.thread.} =
       for path in get_file_list():
         {.gcsafe.}:
           if file_to_last_modded[path.path] < path.lastModTime.toUnixFloat:
+            osproc.terminate(main_program_process)
             echo("Project files changed, rebuilding...")
             is_building = true
             let exit_code = os.exec_shell_cmd("nimble build")
@@ -82,6 +93,7 @@ proc check() {.thread.} =
               discard stdin.read_line()
             file_to_last_modded[path.path] = path.lastModTime.toUnixFloat
             is_building = false
+            run_main_proc()
     finally:
       release(build_lock)
 
@@ -101,4 +113,6 @@ when is_main_module:
   if fnim == "":
     echo "No .nimble found, go to a directory where there is one."
     quit(1)
+  run_main_proc()
   run_checks()
+
