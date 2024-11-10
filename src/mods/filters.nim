@@ -7,6 +7,17 @@ import
   models,
   normal
 
+let extensions_to_watch = @[
+  "nim",
+  "html",
+  "mustache",
+  "hbs",
+  "js",
+  "jsx",
+  "htm",
+  "css"
+]
+
 proc extract_text(input: string): string =
   let start_index = input.find("@[\"")
   let end_index = input.find("\"]")
@@ -23,13 +34,15 @@ proc find_first_nimble_file*(): string =
 proc get_file_list*(): seq[CustomFileInfo] =
   result = @[]
   for file in walk_dir_rec(get_current_dir()):
-    if file.ends_with(".nim"):
-      result.add(
-        CustomFileInfo(
-          path: file,
-          lastModTime: get_last_modification_time(file)
-        )
-      )
+    {.gcsafe.}:
+      for ext in extensions_to_watch:
+        if file.ends_with("." & ext):
+          result.add(
+            CustomFileInfo(
+              path: file,
+              lastModTime: get_last_modification_time(file)
+            )
+          )
 
 proc get_executable_name*(): string =
   var exec_name = ""
