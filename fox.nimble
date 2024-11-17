@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "Navid M"
-description   = "Simple hot reloading for Nim applications"
+description   = "Hot-reloading for development of applications in Nim "
 license       = "MIT"
 srcDir        = "src"
 bin           = @["fox"]
