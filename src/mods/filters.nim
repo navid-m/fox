@@ -1,5 +1,6 @@
 import
-  std/[
+  std /
+  [
     os,
     strutils,
     re,

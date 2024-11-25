@@ -1,5 +1,6 @@
 import
-  std/[
+  std /
+  [
     os,
     times,
     tables,
@@ -8,7 +9,8 @@ import
     exitprocs,
     threadpool,
   ],
-  mods/[
+  mods /
+  [
     filters,
     checks,
     logger
@@ -72,14 +74,17 @@ proc cleanup_lock() {.noconv.} =
   deinit_lock(build_lock)
 
 when is_main_module:
-  run_rec_error_test()
-  init_lock(build_lock)
-  exitprocs.add_exit_proc(cleanup_lock)
-  process_initially()
+  let fn = find_first_nimble_file()
 
-  if find_first_nimble_file() == "":
+  if fn == "" or not file_exists(fn):
     log("No .nimble found, go to a directory where there is one.")
     quit(1)
 
+  run_rec_error_test()
+  init_lock(build_lock)
+
+  exitprocs.add_exit_proc(cleanup_lock)
+
+  process_initially()
   run_main_proc()
   run_checks()
